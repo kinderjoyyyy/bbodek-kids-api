@@ -17,16 +17,16 @@ const auth = new google.auth.JWT(
 const sheets = google.sheets({ version: "v4", auth });
 
 app.post("/open-request", async (req, res) => {
-  const { 기관명 } = req.body;
+  const { 기관명, 주소 } = req.body;
   const now = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
 
   try {
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: "오픈요청!A:B",
+      range: "오픈요청!A:C", // A: 기관명, B: 주소, C: 시간
       valueInputOption: "RAW",
       requestBody: {
-        values: [[기관명, now]],
+        values: [[기관명, 주소, now]],
       },
     });
     res.json({ success: true });
@@ -35,6 +35,7 @@ app.post("/open-request", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`API 서버 실행 중: http://localhost:${PORT}`));
